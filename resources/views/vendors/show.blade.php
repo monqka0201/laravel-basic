@@ -8,6 +8,7 @@
 </head>
 
 <body>
+  <h1>{ $vendor->vendor_name }の商品一覧</h1>
   <table>
     <tr>
       <th>ID</th>
@@ -16,7 +17,7 @@
       <th>作成日時</th>
       <th>更新日時</th>
     </tr>
-    @foreach($products as $product)
+    @foreach($products as $product) 
     <tr>
       <td>{{ $product->id }}</td>
       <td>{{ $product->product_name }}</td>
