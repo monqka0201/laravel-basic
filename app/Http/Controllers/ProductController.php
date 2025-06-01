@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Product;
 use App\Models\Vendor;
 use App\Http\Requests\ProductStoreRequest;
+use App\Events\ProductAddedEvent;
 
 class ProductController extends Controller
 {
@@ -38,7 +39,19 @@ class ProductController extends Controller
         $product->product_name = $request->input('product_name');
         $product->price = $request->input('price');
         $product->vendor_code =$request->input('vendor_code');
+
+        // アップロードされたファイル(name=＂image"）が存在すれば処理を実行する
+        if($request->hasFile('image')) {
+            // アップロードされたファイル(name=#image")をstorage/app/public/productsフォルダに保存し、戻り値（ファイルパス）を変数$image_pathに代入
+            $image_path = $request->file('image')->store('public/products');
+            // ファイルパスからファイル名のみを取得し、Productインスタンスのimage_nameプロパティに代入
+            $product->image_name =basename($image_path);
+        }
+
         $product->save();
+
+        // ProductAddedEventを発生
+        event(new ProductAddedEvent($product));
 
         // リダイレクトさせる
         return redirect("/products/{$product->id}");
